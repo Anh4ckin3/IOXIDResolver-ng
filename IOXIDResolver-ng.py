@@ -23,13 +23,12 @@ class IOXIDResolver_ng:
         self.rpctransport = None
 
     def Identified_Adresse_type(slef, value):
-        length = len(value.encode('utf-8'))  
+        length = len(value.encode('utf-8')) 
 
-        ipv4_regex = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
-        if re.match(ipv4_regex, value):
-            return "IPv4"
 
-        elif 15 <= length <= 39 and ":" in value:
+        if '.' in value:
+                return "IPv4"
+        elif ":" in value:
             return "IPv6"
         else:
             return "Hostname"
@@ -69,7 +68,7 @@ class IOXIDResolver_ng:
             for binding in bindings:
                 NetworkAddr = binding['aNetworkAddr']
                 interface_type = self.Identified_Adresse_type(NetworkAddr)
-                print(f'[+] aNetworkAddr bindings interface : {NetworkAddr} ({interface_type})')
+                print(f'[+] aNetworkAddr addresse : {NetworkAddr} ({interface_type})')
         except Exception as e: 
             print(f"[-] Error while retrieving network interfaces : {e}")
             sys.exit(1) 
