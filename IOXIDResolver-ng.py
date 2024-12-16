@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# File name          : IOXIDResolver-ng.py
+# Author             : Anh4ckin3 
+# Date created       : 16 Dec 2024
+
 from impacket.dcerpc.v5 import transport
 from impacket.dcerpc.v5.rpcrt import RPC_C_AUTHN_LEVEL_NONE, RPC_C_AUTHN_LEVEL_PKT_PRIVACY
 from impacket.dcerpc.v5.dcomrt import IObjectExporter
@@ -15,6 +21,18 @@ class IOXIDResolver_ng:
         self.domain = domain
         self.auth_level = RPC_C_AUTHN_LEVEL_NONE
         self.rpctransport = None
+
+    def Identified_Adresse_type(slef, value):
+        length = len(value.encode('utf-8'))  
+
+        ipv4_regex = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
+        if re.match(ipv4_regex, value):
+            return "IPv4"
+
+        elif 15 <= length <= 39 and ":" in value:
+            return "IPv6"
+        else:
+            return "Hostname"
 
     def set_authentication(self, auth_level=""):
 
@@ -35,50 +53,34 @@ class IOXIDResolver_ng:
             portmap = self.rpctransport.get_dce_rpc()
             portmap.set_auth_level(self.auth_level)
             portmap.connect()
-            print(portmap)
             return portmap
         except Exception as e:
             print(f"[-] Connexion error : {e}")
             sys.exit(1)
 
     def get_network_interfaces(self):
+
         try:
             portmap = self.connect()
             objExporter = IObjectExporter(portmap)
             bindings = objExporter.ServerAlive2()
+            print(f'[+] ServerAlive2 methode find {len(bindings)} interface(s)')
 
-            interfaces = []
             for binding in bindings:
                 NetworkAddr = binding['aNetworkAddr']
-                interfaces.append(NetworkAddr)
-
-            return interfaces
-        except Exception as e:
+                interface_type = self.Identified_Adresse_type(NetworkAddr)
+                print(f'[+] aNetworkAddr bindings interface : {NetworkAddr} ({interface_type})')
+        except Exception as e: 
             print(f"[-] Error while retrieving network interfaces : {e}")
-            sys.exit(1)
-
-    def Identitied_Adresse_type(self):
-        interface = self.get_network_interfaces()
+            sys.exit(1) 
         
-        for i in interface:
-            try: 
-                if isinstance(i, ipaddress.IPv4Address):
-                    print("IPv4")
-                elif isinstance(i, ipaddress.IPv6Address):
-                    print("IPv6")
-            except ValueError:
-                pass 
-            hostname_regex = re.compile(r'^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z]{2,})+$')
-            if hostname_regex.match(i):
-                print("hostname")
-            print("error")
-            sys.exit(1)
-        
-
-            
-
-
 def main():
+
+    banner = '''
+|==========================|
+|  IOXIDResolver Next Gen  |
+|==========================|
+'''
 
     parser = argparse.ArgumentParser(description="Network interface recovery via MSRPC and IObjectExporter.")
     parser.add_argument("-t", "--target", required=True, help="target IP")
@@ -90,17 +92,27 @@ def main():
     args = parser.parse_args()
 
     match args.auth:
+        
         case 'none':
+
             resolver = IOXIDResolver_ng(args.target)
             resolver.set_authentication(args.auth)
+            print(banner)
             print('[*] Anonymous connection on MSRPC')
             print(f'[+] Retriev Network Interfaces for {args.target}...')
-            resolver.Identitied_Adresse_type()
-
-
-
-
+            interfaces = resolver.get_network_interfaces()
         
+        case 'creds': 
+
+            if not all([args.username, args.password, args.target]):
+                parser.error("-t, -u, -p arguments are requires for credential login !")
+
+            resolver = IOXIDResolver_ng(args.target)
+            resolver.set_authentication(args.auth)
+            print(banner)
+            print('[.] Authenticed connection on MSRPC')
+            print(f'[*] Retriev Network Interfaces for {args.target}...')
+            interfaces = resolver.get_network_interfaces()
 
 if __name__ == "__main__":
     main()
