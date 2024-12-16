@@ -10,7 +10,7 @@
 ## Ressource 
 
  - This tool is based on a work made by [Airbus security](https://airbus-cyber-security.com/the-oxid-resolver-part-1-remote-enumeration-of-network-interfaces-without-any-authentication/).
- - Article that helped me understand (juggernaut-sec.com)[https://juggernaut-sec.com/ad-recon-msrpc/#Mapping_RPC_Endpoints_%E2%80%93_rpcmappy]
+ - Article that helped me understand [juggernaut-sec.com](https://juggernaut-sec.com/ad-recon-msrpc/#Mapping_RPC_Endpoints_%E2%80%93_rpcmappy)
 
  
 
@@ -45,3 +45,10 @@ options:
 
 Image demo :
 ![demo](img/demo.png)
+
+## Dependencies :
+
+the script depends just on impacket.
+```
+pip install impacket
+```

@@ -9,7 +9,6 @@ from impacket.dcerpc.v5.rpcrt import RPC_C_AUTHN_LEVEL_NONE, RPC_C_AUTHN_LEVEL_P
 from impacket.dcerpc.v5.dcomrt import IObjectExporter
 import sys
 import argparse
-import ipaddress
 import re
 
 class IOXIDResolver_ng:
@@ -24,7 +23,6 @@ class IOXIDResolver_ng:
 
     def Identified_Adresse_type(slef, value):
         length = len(value.encode('utf-8')) 
-
 
         if '.' in value:
                 return "IPv4"
@@ -63,7 +61,7 @@ class IOXIDResolver_ng:
             portmap = self.connect()
             objExporter = IObjectExporter(portmap)
             bindings = objExporter.ServerAlive2()
-            print(f'[+] ServerAlive2 methode find {len(bindings)} interface(s)')
+            print(f'[+] ServerAlive2 methode return {len(bindings)} interface(s)')
 
             for binding in bindings:
                 NetworkAddr = binding['aNetworkAddr']
@@ -97,7 +95,7 @@ def main():
             resolver = IOXIDResolver_ng(args.target)
             resolver.set_authentication(args.auth)
             print(banner)
-            print('[*] Anonymous connection on MSRPC')
+            print('[.] Anonymous connection on MSRPC')
             print(f'[+] Retriev Network Interfaces for {args.target}...')
             interfaces = resolver.get_network_interfaces()
         
