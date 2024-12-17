@@ -11,7 +11,7 @@ import sys
 import argparse
 import re
 
-class IOXIDResolver_ng:
+class IOXIDResolverNg:
     def __init__(self, target_ip, username=None, password=None, domain=None):
 
         self.target_ip = target_ip
@@ -19,10 +19,9 @@ class IOXIDResolver_ng:
         self.password = password
         self.domain = domain
         self.auth_level = RPC_C_AUTHN_LEVEL_NONE
-        self.rpctransport = None
+        self.rpc_transport = None
 
-    def Identified_Adresse_type(slef, value):
-        length = len(value.encode('utf-8')) 
+    def identified_adresse_type(self, value):
 
         if '.' in value:
                 return "IPv4"
@@ -42,12 +41,12 @@ class IOXIDResolver_ng:
 
         try:
             string_binding = f'ncacn_ip_tcp:{self.target_ip}'
-            self.rpctransport = transport.DCERPCTransportFactory(string_binding)
+            self.rpc_transport = transport.DCERPCTransportFactory(string_binding)
 
             if self.username and self.password:
-                self.rpctransport.set_credentials(self.username, self.password, self.domain)
+                self.rpc_transport.set_credentials(self.username, self.password, self.domain)
 
-            portmap = self.rpctransport.get_dce_rpc()
+            portmap = self.rpc_transport.get_dce_rpc()
             portmap.set_auth_level(self.auth_level)
             portmap.connect()
             return portmap
@@ -65,7 +64,7 @@ class IOXIDResolver_ng:
 
             for binding in bindings:
                 NetworkAddr = binding['aNetworkAddr']
-                interface_type = self.Identified_Adresse_type(NetworkAddr)
+                interface_type = self.identified_adresse_type(NetworkAddr)
                 print(f'[+] aNetworkAddr addresse : {NetworkAddr} ({interface_type})')
         except Exception as e: 
             print(f"[-] Error while retrieving network interfaces : {e}")
@@ -88,19 +87,19 @@ def main():
     args = parser.parse_args()
 
     if args.username and args.password and args.domain:
-        resolver = IOXIDResolver_ng(args.target, args.username, args.password, args.domain)
+        resolver = IOXIDResolverNg(args.target, args.username, args.password, args.domain)
         resolver.set_authentication()
         print(banner)
         print('[.] Authenticed connection on MSRPC')
         print(f'[*] Retriev Network Interfaces for {args.target}...')
-        interfaces = resolver.get_network_interfaces()
+        resolver.get_network_interfaces()
     else:
-        resolver = IOXIDResolver_ng(args.target)
+        resolver = IOXIDResolverNg(args.target)
         resolver.set_authentication()
         print(banner)
         print('[.] Anonymous connection on MSRPC')
         print(f'[+] Retriev Network Interfaces for {args.target}...')
-        interfaces = resolver.get_network_interfaces()
+        resolver.get_network_interfaces()
 
 
 if __name__ == "__main__":
