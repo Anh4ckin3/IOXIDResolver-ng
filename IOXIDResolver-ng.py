@@ -31,9 +31,9 @@ class IOXIDResolver_ng:
         else:
             return "Hostname"
 
-    def set_authentication(self, auth_level=""):
+    def set_authentication(self):
 
-        if auth_level == "creds" and self.username and self.password:
+        if self.username and self.password:
             self.auth_level = RPC_C_AUTHN_LEVEL_PKT_PRIVACY
         else:
             self.auth_level = RPC_C_AUTHN_LEVEL_NONE
@@ -84,32 +84,24 @@ def main():
     parser.add_argument("-u", "--username", help="username")
     parser.add_argument("-p", "--password", help="password")
     parser.add_argument("-d", "--domain", help="Domain")
-    parser.add_argument("-a", "--auth", choices=["none", "creds"], default="none", help="auth methode (anonymous by default)")
 
     args = parser.parse_args()
 
-    match args.auth:
-        
-        case 'none':
+    if args.username and args.password and args.domain:
+        resolver = IOXIDResolver_ng(args.target, args.username, args.password, args.domain)
+        resolver.set_authentication()
+        print(banner)
+        print('[.] Authenticed connection on MSRPC')
+        print(f'[*] Retriev Network Interfaces for {args.target}...')
+        interfaces = resolver.get_network_interfaces()
+    else:
+        resolver = IOXIDResolver_ng(args.target)
+        resolver.set_authentication()
+        print(banner)
+        print('[.] Anonymous connection on MSRPC')
+        print(f'[+] Retriev Network Interfaces for {args.target}...')
+        interfaces = resolver.get_network_interfaces()
 
-            resolver = IOXIDResolver_ng(args.target)
-            resolver.set_authentication(args.auth)
-            print(banner)
-            print('[.] Anonymous connection on MSRPC')
-            print(f'[+] Retriev Network Interfaces for {args.target}...')
-            interfaces = resolver.get_network_interfaces()
-        
-        case 'creds': 
-
-            if not all([args.username, args.password, args.target]):
-                parser.error("-t, -u, -p arguments are requires for credential login !")
-
-            resolver = IOXIDResolver_ng(args.target)
-            resolver.set_authentication(args.auth)
-            print(banner)
-            print('[.] Authenticed connection on MSRPC')
-            print(f'[*] Retriev Network Interfaces for {args.target}...')
-            interfaces = resolver.get_network_interfaces()
 
 if __name__ == "__main__":
     main()
