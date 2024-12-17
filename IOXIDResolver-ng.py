@@ -90,15 +90,15 @@ def main():
         resolver = IOXIDResolverNg(args.target, args.username, args.password, args.domain)
         resolver.set_authentication()
         print(banner)
-        print('[.] Authenticed connection on MSRPC')
-        print(f'[*] Retriev Network Interfaces for {args.target}...')
+        print('[.] Authenticated connection on MSRPC')
+        print(f'[*] Retrieve Network Interfaces for {args.target}...')
         resolver.get_network_interfaces()
     else:
         resolver = IOXIDResolverNg(args.target)
         resolver.set_authentication()
         print(banner)
         print('[.] Anonymous connection on MSRPC')
-        print(f'[+] Retriev Network Interfaces for {args.target}...')
+        print(f'[+] Retrieve Network Interfaces for {args.target}...')
         resolver.get_network_interfaces()
 
 
