@@ -75,6 +75,10 @@ def main():
     parser.add_argument("-p", "--password", help="password")
     parser.add_argument("-d", "--domain", help="Domain")
 
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
     args = parser.parse_args()
 
     if args.username and args.password and args.domain:
