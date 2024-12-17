@@ -9,7 +9,7 @@ from impacket.dcerpc.v5.rpcrt import RPC_C_AUTHN_LEVEL_NONE, RPC_C_AUTHN_LEVEL_P
 from impacket.dcerpc.v5.dcomrt import IObjectExporter
 import sys
 import argparse
-import re
+from IOXIDResolverng.utils import identify_adresse_type
 
 class IOXIDResolverNg:
     def __init__(self, target_ip, username=None, password=None, domain=None):
@@ -20,15 +20,6 @@ class IOXIDResolverNg:
         self.domain = domain
         self.auth_level = RPC_C_AUTHN_LEVEL_NONE
         self.rpc_transport = None
-
-    def identified_adresse_type(self, value):
-
-        if '.' in value:
-                return "IPv4"
-        elif ":" in value:
-            return "IPv6"
-        else:
-            return "Hostname"
 
     def set_authentication(self):
 
@@ -64,7 +55,7 @@ class IOXIDResolverNg:
 
             for binding in bindings:
                 NetworkAddr = binding['aNetworkAddr']
-                interface_type = self.identified_adresse_type(NetworkAddr)
+                interface_type = identify_adresse_type(NetworkAddr)
                 print(f'[+] aNetworkAddr addresse : {NetworkAddr} ({interface_type})')
         except Exception as e: 
             print(f"[-] Error while retrieving network interfaces : {e}")
