@@ -36,7 +36,7 @@ options:
 ```
 
 ## Demo
-![demo](img/demo.png)
+![demo](.github/assets/demo.png)
 
 ## Resources
 
